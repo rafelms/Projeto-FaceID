@@ -30,6 +30,7 @@
                             <span class="d-lg-inline d-none ms-2">Início</span>
                         </a>
                     </li>
+                    {% if session.get('admin_logged_in') %}
                     <li class="nav-item">
                         <a class="nav-link" href="/cadastro">
                             <i class="bi bi-person-plus"></i>
@@ -42,6 +43,20 @@
                             <span class="d-lg-inline d-none ms-2">Lista</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="d-lg-inline d-none ms-2">Sair</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/login">
+                            <i class="bi bi-shield-lock"></i>
+                            <span class="d-lg-inline d-none ms-2">Admin</span>
+                        </a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="/reconhecer">
                             <i class="bi bi-image"></i>
@@ -95,8 +110,8 @@
             const body = document.body;
             const themeToggle = document.getElementById('themeToggle');
             
-            // Load saved theme preference or default to light mode
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            // Load saved theme preference or default to DARK mode
+            const savedTheme = localStorage.getItem('theme') || 'dark';
             
             // Apply saved theme immediately to prevent flash
             if (savedTheme === 'dark') {

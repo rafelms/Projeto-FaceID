@@ -9,6 +9,7 @@
 Projeto acadêmico focado em segurança biométrica e visão computacional. Trata-se de uma aplicação web capaz de gerenciar usuários e realizar reconhecimento facial em tempo real com alta precisão, utilizando processamento otimizado para navegadores e infraestrutura moderna em contêineres Docker.
 
 ## ✨ Funcionalidades Implementadas
+* **Autenticação Administrativa:** Sistema de login seguro com rotas protegidas para garantir que apenas administradores possam cadastrar ou listar pessoas.
 * **Gestão de Usuários:** Cadastro completo com validação biométrica preventiva (impede o cadastro de fotos sem rostos detectáveis).
 * **Reconhecimento Multimodal:** Identificação via upload de arquivos ou captura direta por webcam.
 * **Otimização de Renderização:** Interface preparada com aceleração via GPU (`transform: translateZ`) para garantir a fluidez no streaming de vídeo.

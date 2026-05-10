@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from werkzeug.utils import secure_filename
+from functools import wraps
 import os
 import sqlite3
 import face_recognition
@@ -7,17 +8,52 @@ import base64
 import io
 
 app = Flask(__name__)
-# Configura a pasta onde as imagens serão salvas
+app.secret_key = 'admin_secret_key_2026'  # Para sessions
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Credenciais admin
+ADMIN_LOGIN = 'admin'
+ADMIN_PASSWORD = '1234'
+
+# Decorator para verificar login admin
+def require_admin(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'admin_logged_in' not in session:
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Rota de login admin
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == ADMIN_LOGIN and password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(url_for('index'))
+        else:
+            return render_template('admin_login.html', error='Credenciais inválidas')
+    
+    return render_template('admin_login.html')
+
+# Rota de logout
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('index'))
 
 # Rota da Tela Inicial
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Rota da Tela de Cadastro
+# Rota da Tela de Cadastro (PROTEGIDA POR ADMIN)
 @app.route('/cadastro', methods=['GET', 'POST'])
+@require_admin
 def cadastro():
     if request.method == 'POST':
         nome = request.form['nome']
@@ -60,6 +96,7 @@ def cadastro():
     return render_template('cadastro.html')
 
 @app.route('/pessoas')
+@require_admin
 def lista_pessoas():
     # Conecta ao banco de dados e busca todos os cadastros
     conn = sqlite3.connect('faceid.db')
@@ -73,8 +110,9 @@ def lista_pessoas():
     # Envia a lista 'pessoas' para a página HTML renderizar
     return render_template('lista_pessoas.html', pessoas=pessoas)
 
-# Rota para excluir uma pessoa e sua imagem
+# Rota para excluir uma pessoa e sua imagem (PROTEGIDA POR ADMIN)
 @app.route('/excluir/<int:id>', methods=['POST'])
+@require_admin
 def excluir_pessoa(id):
     conn = sqlite3.connect('faceid.db')
     cursor = conn.cursor()
