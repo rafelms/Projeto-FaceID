@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow p-4 mx-auto" style="max-width: 500px;">
+    <h2 class="text-center mb-4">Reconhecimento por Imagem</h2>
+    
+    {% if mensagem %}
+        <div class="alert {% if 'Sucesso' in mensagem %}alert-success{% else %}alert-danger{% endif %} text-center" role="alert">
+            <strong>{{ mensagem }}</strong>
+        </div>
+    {% endif %}
+
+    <form method="POST" action="/reconhecer" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="foto" class="form-label">Envie uma foto para identificar a pessoa:</label>
+            <input type="file" class="form-control" id="foto" name="foto" accept="image/*" required>
+        </div>
+        
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Iniciar Reconhecimento</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

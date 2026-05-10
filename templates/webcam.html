@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow p-4 mx-auto text-center" style="max-width: 600px;">
+    <h2 class="mb-4">Reconhecimento via Webcam</h2>
+    
+    <div class="mb-3">
+        <video id="video" width="100%" height="auto" autoplay muted playsinline class="border rounded" style="transform: translateZ(0); will-change: transform;"></video>
+    </div>
+    
+    <div class="d-grid gap-2 mb-3">
+        <button id="btnCapturar" class="btn btn-success btn-lg">Identificar Rosto</button>
+    </div>
+
+    <div id="resultado" class="alert alert-info d-none" role="alert">
+        Aguardando captura...
+    </div>
+
+    <canvas id="canvas" class="d-none"></canvas>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const btnCapturar = document.getElementById('btnCapturar');
+    const resultadoDiv = document.getElementById('resultado');
+
+    // 1. Pede permissão e liga a câmera do usuário
+    const constraints = {
+    video: {
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+        facingMode: "user" // Garante que usa a câmera frontal/principal
+    }
+};
+
+navigator.mediaDevices.getUserMedia(constraints)
+    .then(stream => {
+        video.srcObject = stream;
+        
+        // Garante que o vídeo vai tocar mesmo em restrições pesadas de bateria
+        video.onloadedmetadata = () => {
+            video.play().catch(e => console.error("Erro ao dar play no vídeo:", e));
+        };
+    })
+    .catch(err => {
+        console.error("Erro ao acessar webcam:", err);
+        resultadoDiv.classList.remove('d-none');
+        resultadoDiv.classList.replace('alert-info', 'alert-danger');
+        resultadoDiv.innerHTML = "Erro ao acessar a câmera. Verifique as permissões.";
+    });
+
+    // 2. Quando clicar no botão, tira a foto e envia
+    btnCapturar.addEventListener('click', () => {
+        resultadoDiv.classList.remove('d-none');
+        resultadoDiv.classList.replace('alert-success', 'alert-info');
+        resultadoDiv.classList.replace('alert-danger', 'alert-info');
+        resultadoDiv.innerHTML = "Processando imagem... Aguarde.";
+
+        // Desenha o vídeo no canvas
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Transforma o canvas em uma imagem Base64
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        // Envia para o servidor Python
+        fetch('/processar_webcam', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imagem: imageData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.reconhecido) {
+                resultadoDiv.classList.replace('alert-info', 'alert-success');
+                resultadoDiv.innerHTML = `<strong>Acesso Liberado!</strong><br>Nome: ${data.nome} <br>ID: ${data.id} <br>Confiança: ${data.confianca}%`;
+            } else {
+                resultadoDiv.classList.replace('alert-info', 'alert-danger');
+                resultadoDiv.innerHTML = `<strong>Acesso Negado:</strong> ${data.mensagem}`;
+            }
+        })
+        .catch(error => {
+            resultadoDiv.classList.replace('alert-info', 'alert-danger');
+            resultadoDiv.innerHTML = "Erro ao se comunicar com o servidor.";
+        });
+    });
+</script>
+{% endblock %}

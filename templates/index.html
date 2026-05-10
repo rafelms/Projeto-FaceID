@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Bem-vindo ao Sistema FaceID</h1>
+    <p class="lead">Sistema de Reconhecimento Facial</p>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('cadastro') }}" class="btn btn-primary">Fazer Cadastro</a>
+        <a href="{{ url_for('reconhecer') }}" class="btn btn-secondary">Reconhecer por Foto</a>
+        <a href="{{ url_for('webcam') }}" class="btn btn-success">Reconhecer pela Webcam</a>
+        <a href="{{ url_for('lista_pessoas') }}" class="btn btn-info">Lista de Pessoas</a>
+    </div>
+</div>
+{% endblock %}
