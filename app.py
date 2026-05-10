@@ -8,7 +8,7 @@ import base64
 import io
 
 app = Flask(__name__)
-app.secret_key = 'admin_secret_key_2026'  # Para sessions
+app.secret_key = 'admin_secret_key'  # Para sessions
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
