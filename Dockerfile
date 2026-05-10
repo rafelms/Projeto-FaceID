@@ -1,5 +1,5 @@
 # Usa uma imagem Python leve, mas com as ferramentas de compilação necessárias
-FROM python:3.10-slim-bullseye
+FROM python:3.11-slim-bullseye
 
 # Instala as dependências do sistema necessárias para o dlib e opencv
 RUN apt-get update && apt-get install -y \
