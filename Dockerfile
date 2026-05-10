@@ -1,27 +1,20 @@
-# Usa uma imagem Python leve, mas com as ferramentas de compilação necessárias
-FROM python:3.11-slim-bullseye
-
-# Instala as dependências do sistema necessárias para o dlib e opencv
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    g++ \
-    libv4l-dev \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+# Usamos uma imagem que já tem dlib e face_recognition pré-instalados e otimizados
+FROM animcogn/face_recognition:cpu
 
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Copia os arquivos de requisitos e instala as bibliotecas
+# Copia apenas o arquivo de requisitos
 COPY requirements.txt .
+
+# Instalamos as outras dependências, ignorando dlib e face_recognition 
+# pois eles já estão na imagem base
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o restante do código do projeto
 COPY . .
 
-# Expõe a porta que o Flask/Gunicorn vai usar
+# A porta padrão do Render para Docker é 10000
 EXPOSE 10000
 
 # Comando para rodar a aplicação usando Gunicorn
