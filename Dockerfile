@@ -7,9 +7,9 @@ WORKDIR /app
 # Copia apenas o arquivo de requisitos
 COPY requirements.txt .
 
-# Instalamos as outras dependências, ignorando dlib e face_recognition 
-# pois eles já estão na imagem base
-RUN pip install --no-cache-dir -r requirements.txt
+# Atualiza o pip e instala as dependências
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copia o restante do código do projeto
 COPY . .
