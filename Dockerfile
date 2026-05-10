@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 10000
 
 # Comando para rodar a aplicação usando Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
+CMD python database.py && gunicorn --bind 0.0.0.0:10000 app:app
